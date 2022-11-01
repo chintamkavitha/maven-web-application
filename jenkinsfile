@@ -1,0 +1,27 @@
+node {
+    def mavenHome = tool name: "maven_3.8.6"
+   
+    echo "Build number: ${env.BUILD_NUMBER}"
+   // echo "Job name is: ${env.JOB_NAME}"
+    echo "Node name is: ${env.NODE_NAME}"
+    
+properties([buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '5', daysToKeepStr: '', numToKeepStr: '5')), [$class: 'JobLocalConfiguration', changeReasonComment: ''], pipelineTriggers([pollSCM('* * * * *')])])
+    stage('CheckoutCode'){
+   git branch: 'development', credentialsId: '4929d3b5-06b8-409e-8a45-080e4f9c633c', url: 'https://github.com/chintamkavitha/maven-web-application.git' 
+   }
+   stage('Build'){
+    sh"${mavenHome}/bin/mvn clean package"
+    }
+   /*
+   stage('ExecuteSonarQubeReport'){
+        sh"${mavenHome}/bin/mvn sonar:sonar"
+    }
+    stage('UploadArtifactsToNexus'){
+        sh"${mavenHome}/bin/mvn deploy"
+    }
+    stage('DeployAppIntoTomcatserver'){
+        sshagent(['a5799c6c-0a8d-4540-a510-3aa3108d2ee3']) {
+        sh"scp -o StrictHostKeyChecking=no target/maven-web-application.war ec2-user@172.31.12.110:/opt/apache-tomcat-9.0.68/webapps/"
+            }
+}*/
+}
